@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-ubuntu-slave
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-ubuntu-slave
+  template:
+    metadata:
+      labels:
+        app: jenkins-ubuntu-slave
+    spec:
+      # initContainers:
+      # - name: install-gcloud
+      #   image: google/cloud-sdk:latest
+      #   command: ['bash', '-c']
+        # args:
+        # - |
+          # apt-get update && apt-get install -y curl
+          # curl https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-434.0.0-linux-x86_64.tar.gz -o /tmp/gcloud.tar.gz
+          # tar xf /tmp/gcloud.tar.gz -C /usr/local
+          # /usr/local/google-cloud-sdk/install.sh
+          # ln -s /usr/local/google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud
+      
+ 
+
+      containers:
+      - name: jenkins-ubuntu-slave
+        image: ahmadesmailshata/enhanced-agent
+        ports:
+        - containerPort: 22
+        volumeMounts:
+          - mountPath: /var/run/docker.sock
+            name: docker-sock
+       # volumeMounts:  # Add this section
+          - name: gcloud-bin
+            mountPath: /usr/local/bin/gcloud
+            subPath: gcloud
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+      #volumes:  # Add this section
+        - name: gcloud-bin
+          emptyDir: {}
